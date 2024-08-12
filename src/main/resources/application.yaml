@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: tracks-service
+  datasource:
+    url: jdbc:postgresql://postgresql:5433/postgres
+    username: postgres
+    password: password
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        hbm2ddl:
+          auto: validate
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://eureka-service:8070/eureka
+
+server:
+  port: 8085
