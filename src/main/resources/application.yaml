@@ -12,6 +12,12 @@ spring:
         format_sql: true
         hbm2ddl:
           auto: validate
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+  mvc:
+    format:
+      date: iso
 
 eureka:
   instance:
@@ -24,3 +30,9 @@ eureka:
 
 server:
   port: 8085
+
+minio:
+  bucket: images
+  url: http://minio:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
