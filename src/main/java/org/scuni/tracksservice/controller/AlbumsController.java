@@ -31,7 +31,7 @@ public class AlbumsController {
     }
 
     @GetMapping("/albums")
-    public ResponseEntity<Object> getAlbumByIds(@RequestParam("ids") List<Integer> ids) {
+    public ResponseEntity<Object> getAlbumsByIds(@RequestParam("ids") List<Integer> ids) {
         List<AlbumReadDto> albumReadDtos = albumsService.getAlbumsByIds(ids);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
