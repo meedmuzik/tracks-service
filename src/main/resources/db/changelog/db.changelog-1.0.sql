@@ -1,6 +1,6 @@
 --liquibase formatted sql
 
---changeset egorsemenovv:1
+--changeset semenovvegor:1
 CREATE TABLE album
 (
     id           SERIAL PRIMARY KEY,
@@ -9,7 +9,7 @@ CREATE TABLE album
     title        VARCHAR(32) NOT NULL
 );
 
---changeset egorsemenovv:2
+--changeset semenovvegor:2
 CREATE TABLE track
 (
     id           BIGSERIAL PRIMARY KEY,
