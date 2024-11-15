@@ -1,14 +1,23 @@
 package org.scuni.tracksservice.model.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Id;
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
-@Table(name = "album")
+
+@Node("Album")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,26 +26,22 @@ import java.util.Set;
 @ToString(exclude = "tracks")
 @EqualsAndHashCode(of = "id")
 public class Album {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue
+    private Long id;
 
-    @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
     private LocalDate releaseDate;
 
     private String imageId;
 
-
-    @OneToMany(mappedBy = "album", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
-    @Builder.Default
+    @Relationship(type = "HAS_TRACK", direction = Relationship.Direction.OUTGOING)
     private Set<Track> tracks = new HashSet<>();
 
-    public void addTrack(Track track){
+    public void addTrack(Track track) {
         tracks.add(track);
     }
 }
+
+

@@ -1,12 +1,20 @@
 package org.scuni.tracksservice.model.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.data.neo4j.core.schema.GeneratedValue;
+import org.springframework.data.neo4j.core.schema.Id;
+import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "track")
+@Node("Track")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,22 +23,18 @@ import java.time.LocalDate;
 @ToString(exclude = "album")
 @EqualsAndHashCode(of = "id")
 public class Track {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private Long id;
 
-    @Column(nullable = false, length = 32)
     private String title;
 
-    @Column(length = 32)
     private String imageId;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
     private LocalDate releaseDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "album_id")
+    private Double rating;
+
+    @Relationship(type = "HAS_TRACK", direction = Relationship.Direction.INCOMING)
     private Album album;
 }

@@ -26,12 +26,12 @@ public class AlbumsController {
     private final AlbumsService albumsService;
 
     @GetMapping("/album/{id}")
-    public ResponseEntity<AlbumReadDto> getAlbum(@PathVariable("id") @Min(1) Integer id) {
+    public ResponseEntity<AlbumReadDto> getAlbum(@PathVariable("id") @Min(1) Long id) {
         return ResponseEntity.ok(albumsService.getAlbumById(id));
     }
 
     @GetMapping("/albums")
-    public ResponseEntity<Object> getAlbumsByIds(@RequestParam("ids") List<Integer> ids) {
+    public ResponseEntity<Object> getAlbumByIds(@RequestParam("ids") List<Long> ids) {
         List<AlbumReadDto> albumReadDtos = albumsService.getAlbumsByIds(ids);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -39,14 +39,14 @@ public class AlbumsController {
     }
 
     @DeleteMapping("/album/{id}")
-    public ResponseEntity<Object> deleteTrackById(@PathVariable("id") @Min(1) Integer id) {
+    public ResponseEntity<Object> deleteTrackById(@PathVariable("id") @Min(1) Long id) {
         albumsService.deleteAlbumById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/album/{id}")
-    public ResponseEntity<Object> updateTrackById(@PathVariable("id") @Min(1) Integer id,
-                                                  @RequestBody @Validated AlbumCreateEditDto albumCreateEditDto){
+    public ResponseEntity<Object> updateTrackById(@PathVariable("id") @Min(1) Long id,
+                                                  @RequestBody @Validated AlbumCreateEditDto albumCreateEditDto) {
         AlbumReadDto album = albumsService.updateAlbumById(id, albumCreateEditDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -56,25 +56,25 @@ public class AlbumsController {
     }
 
     @DeleteMapping("/album/{albumId}/track/{trackId}")
-    public ResponseEntity<Object> deleteTrackFromAlbum(@PathVariable("albumId") @Min(1) Integer albumId,
-                                                       @PathVariable("trackId") @Min(1) Long trackId){
+    public ResponseEntity<Object> deleteTrackFromAlbum(@PathVariable("albumId") @Min(1) Long albumId,
+                                                       @PathVariable("trackId") @Min(1) Long trackId) {
         albumsService.deleteTrackFromAlbum(trackId, albumId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/album")
     public ResponseEntity<Object> createAlbum(@RequestBody @Validated AlbumCreateEditDto albumCreateEditDto) {
-        Integer albumId = albumsService.createAlbum(albumCreateEditDto);
+        Long albumId = albumsService.createAlbum(albumCreateEditDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of("message","Album was uploaded successfully",
+                .body(Map.of("message", "Album was uploaded successfully",
                         "id", albumId,
-                        "image upload url", "/api/v1/images/album/"+albumId));
+                        "image upload url", "/api/v1/images/album/" + albumId));
     }
 
     @PatchMapping("/album/{albumId}/track/{trackId}")
-    public ResponseEntity<Object> addTrackToAlbum(@PathVariable("albumId") @Min(1) Integer albumId,
-                                                  @PathVariable("trackId") @Min(1) Long trackId){
+    public ResponseEntity<Object> addTrackToAlbum(@PathVariable("albumId") @Min(1) Long albumId,
+                                                  @PathVariable("trackId") @Min(1) Long trackId) {
         albumsService.addTrackToAlbum(albumId, trackId);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -83,17 +83,16 @@ public class AlbumsController {
 
     @GetMapping("/albums/paginated")
     public ResponseEntity<Object> getAlbumsPaginatedByTitle(@RequestParam String title,
-                                                     @RequestParam @Min(0) int page,
-                                                     @RequestParam @Min(1) int size,
-                                                     @RequestParam(required = false) String sort){
+                                                            @RequestParam @Min(0) int page,
+                                                            @RequestParam @Min(1) int size,
+                                                            @RequestParam(required = false) String sort) {
         PageRequest pageRequest;
 
-        if (sort == null){
+        if (sort == null) {
             pageRequest = PageRequest.of(page, size);
-        }
-        else if (sort.equalsIgnoreCase("asc")) {
+        } else if (sort.equalsIgnoreCase("asc")) {
             pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.asc("title")));
-        } else if (sort.equalsIgnoreCase("desc")){
+        } else if (sort.equalsIgnoreCase("desc")) {
             pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("title")));
         } else {
             pageRequest = PageRequest.of(page, size);
@@ -101,7 +100,6 @@ public class AlbumsController {
         Page<AlbumReadDto> albums = albumsService.getAlbumsByTitle(title, pageRequest);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of( "albums", albums));
+                .body(Map.of("albums", albums));
     }
-
 }

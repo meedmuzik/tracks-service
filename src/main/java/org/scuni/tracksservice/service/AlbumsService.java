@@ -31,25 +31,26 @@ public class AlbumsService {
     private final AlbumReadMapper albumReadMapper;
     private final AlbumCreateEditMapper albumCreateEditMapper;
 
-    public AlbumReadDto getAlbumById(Integer id) {
+    public AlbumReadDto getAlbumById(Long id) {
         return albumRepository.findById(id)
                 .map(albumReadMapper::map)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public List<AlbumReadDto> getAlbumsByIds(List<Integer> ids) {
+    public List<AlbumReadDto> getAlbumsByIds(List<Long> ids) {
         List<Album> allByIds = albumRepository.findAllByIds(ids);
         return allByIds.stream().map(albumReadMapper::map).collect(Collectors.toList());
     }
 
-    public void deleteAlbumById(Integer id) {
+    public void deleteAlbumById(Long id) {
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        albumRepository.delete(album);
+        albumRepository.deleteAlbumAndRelationships(id);
+//        albumRepository.delete(album);
     }
 
-    public void deleteTrackFromAlbum(Long trackId, Integer albumId) {
-        Album album = albumRepository.findByIdWithTracks(albumId).orElseThrow(() ->
+    public void deleteTrackFromAlbum(Long trackId, Long albumId) {
+        Album album = albumRepository.findById(albumId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "album with id" + albumId + " does not exist"));
         Set<Track> tracks = album.getTracks();
         Track trackToRemove = tracks.stream()
@@ -57,34 +58,36 @@ public class AlbumsService {
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "track with id" + trackId + "not in album"));
+        albumRepository.deleteTrackAndRelationship(albumId, trackId);
         tracks.remove(trackToRemove);
         trackToRemove.setAlbum(null);
     }
 
-    public AlbumReadDto updateAlbumById(Integer id, AlbumCreateEditDto albumCreateEditDto) {
+    public AlbumReadDto updateAlbumById(Long id, AlbumCreateEditDto albumCreateEditDto) {
         Album album = albumRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         album.setTitle(albumCreateEditDto.getTitle());
         album.setReleaseDate(albumCreateEditDto.getReleaseDate());
         return albumReadMapper.map(album);
     }
 
-    public Integer createAlbum(AlbumCreateEditDto albumCreateEditDto) {
+    public Long createAlbum(AlbumCreateEditDto albumCreateEditDto) {
         Album album = albumCreateEditMapper.map(albumCreateEditDto);
-        albumRepository.saveAndFlush(album);
+        albumRepository.save(album);
         return album.getId();
     }
 
-    public void addTrackToAlbum(Integer albumId, Long trackId){
+    public void addTrackToAlbum(Long albumId, Long trackId) {
         Optional<Track> optionalTrack = trackRepository.findById(trackId);
-        if (optionalTrack.isEmpty()){
+        if (optionalTrack.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "track with id: " + trackId + "does not exist");
         }
         Optional<Album> optionalAlbum = albumRepository.findById(albumId);
-        if (optionalAlbum.isPresent()){
-            Album album = optionalAlbum.get();
-            album.addTrack(optionalTrack.get());
-            Track track = optionalTrack.get();
-            track.setAlbum(album);
+        if (optionalAlbum.isPresent()) {
+//            Album album = optionalAlbum.get();
+//            album.addTrack(optionalTrack.get());
+//            Track track = optionalTrack.get();
+//            track.setAlbum(album);
+            albumRepository.addTrackToAlbum(albumId, trackId);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "album with id: " + albumId + "does not exist");
         }
@@ -95,12 +98,12 @@ public class AlbumsService {
         return albums.map(albumReadMapper::map);
     }
 
-    public void updateImageIdById(String imageId, Integer id){
+    public void updateImageIdById(String imageId, Long id) {
         albumRepository.updateImageIdById(id, imageId);
     }
 
 
-    public boolean isAlbumExistsById(Integer id){
+    public boolean isAlbumExistsById(Long id) {
         return albumRepository.existsById(id);
     }
 

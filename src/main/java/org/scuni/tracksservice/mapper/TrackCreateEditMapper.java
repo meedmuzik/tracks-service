@@ -5,12 +5,13 @@ import org.scuni.tracksservice.model.entity.Track;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TrackCreateEditMapper implements Mapper<TrackCreateEditDto, Track>{
+public class TrackCreateEditMapper implements Mapper<TrackCreateEditDto, Track> {
 
     @Override
     public Track map(TrackCreateEditDto trackCreateEditDto) {
         return Track.builder()
                 .title(trackCreateEditDto.getTitle())
+                .rating(0.0)
                 .releaseDate(trackCreateEditDto.getReleaseDate())
                 .build();
     }

@@ -49,14 +49,14 @@ public class TracksController {
         Long trackId = trackService.createTrack(trackCreateEditDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of("message","Track was uploaded successfully",
+                .body(Map.of("message", "Track was uploaded successfully",
                         "id", trackId,
-                        "image upload url", "/api/v1/images/track/"+trackId));
+                        "image upload url", "/api/v1/images/track/" + trackId));
     }
 
     @PutMapping("/track/{id}")
     public ResponseEntity<Object> updateTrackById(@PathVariable("id") @Min(1) Long id,
-                                                  @RequestBody @Validated TrackCreateEditDto trackCreateEditDto){
+                                                  @RequestBody @Validated TrackCreateEditDto trackCreateEditDto) {
         TrackReadDto track = trackService.updateTrackById(id, trackCreateEditDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -69,15 +69,14 @@ public class TracksController {
     public ResponseEntity<Object> getTracksPaginatedByTitle(@RequestParam String title,
                                                             @RequestParam @Min(0) int page,
                                                             @RequestParam @Min(1) int size,
-                                                            @RequestParam(required = false) String sort){
+                                                            @RequestParam(required = false) String sort) {
         PageRequest pageRequest;
 
-        if (sort == null){
+        if (sort == null) {
             pageRequest = PageRequest.of(page, size);
-        }
-        else if (sort.equalsIgnoreCase("asc")) {
+        } else if (sort.equalsIgnoreCase("asc")) {
             pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.asc("title")));
-        } else if (sort.equalsIgnoreCase("desc")){
+        } else if (sort.equalsIgnoreCase("desc")) {
             pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("title")));
         } else {
             pageRequest = PageRequest.of(page, size);
@@ -85,6 +84,13 @@ public class TracksController {
         Page<TrackReadDto> tracks = trackService.getTrackByTitle(title, pageRequest);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Map.of( "tracks", tracks));
+                .body(Map.of("tracks", tracks));
     }
+
+    @PatchMapping("/track/rating/{id}")
+    public ResponseEntity<Object> updateTrackRating(@PathVariable("id") @Min(1) Long id) {
+        trackService.updateTrackRating(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
