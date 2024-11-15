@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Getter
 public class TrackReadDto {
     private Long trackId;
+    private Double rating;
     private String title;
     private String imageUrl;
     private LocalDate releaseDate;

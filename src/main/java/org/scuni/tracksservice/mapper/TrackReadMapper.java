@@ -17,11 +17,12 @@ public class TrackReadMapper implements Mapper<Track, TrackReadDto> {
         Optional<Album> album = Optional.ofNullable(track.getAlbum());
         return TrackReadDto.builder()
                 .trackId(track.getId())
-                .imageUrl(track.getImageId() == null ? null: "/api/v1/images/" + track.getImageId())
+                .imageUrl(track.getImageId() == null ? null : "/api/v1/images/" + track.getImageId())
                 .title(track.getTitle())
                 .albumId(album.map(Album::getId).orElse(null))
                 .albumTitle(album.map(Album::getTitle).orElse(null))
                 .releaseDate(track.getReleaseDate())
+                .rating(track.getRating())
                 .build();
     }
 }

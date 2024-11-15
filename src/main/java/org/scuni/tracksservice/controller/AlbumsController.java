@@ -102,5 +102,4 @@ public class AlbumsController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of("albums", albums));
     }
-
 }

@@ -33,6 +33,8 @@ public class Track {
 
     private LocalDate releaseDate;
 
+    private Double rating;
+
     @Relationship(type = "HAS_TRACK", direction = Relationship.Direction.INCOMING)
     private Album album;
 }

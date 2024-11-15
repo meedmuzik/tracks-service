@@ -86,4 +86,11 @@ public class TracksController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of("tracks", tracks));
     }
+
+    @PatchMapping("/track/rating/{id}")
+    public ResponseEntity<Object> updateTrackRating(@PathVariable("id") @Min(1) Long id) {
+        trackService.updateTrackRating(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

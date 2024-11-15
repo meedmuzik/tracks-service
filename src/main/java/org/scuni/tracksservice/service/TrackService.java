@@ -86,4 +86,11 @@ public class TrackService {
     public boolean isTrackExistsById(Long id) {
         return trackRepository.existsById(id);
     }
+
+    public void updateTrackRating(Long id) {
+        Track track = trackRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Double updatedRating = trackRepository.calculateTrackRating(id);
+        track.setRating(updatedRating);
+        trackRepository.save(track);
+    }
 }

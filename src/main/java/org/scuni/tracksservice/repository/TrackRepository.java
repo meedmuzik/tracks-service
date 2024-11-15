@@ -27,4 +27,11 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
         DELETE r
     """)
     void deleteTrackRelationships(@Param("trackId") Long trackId);
+
+    @Query("""
+        MATCH (t:Track)-[:HAS_COMMENT]->(c:Comment)
+        WHERE id(t) = $trackId
+        RETURN AVG(c.rating) AS averageRating
+    """)
+    Double calculateTrackRating(@Param("trackId") Long trackId);
 }
