@@ -22,5 +22,5 @@ public class TrackCreateEditDto {
     private LocalDate releaseDate;
 
     @Min(1)
-    private Integer albumId;
+    private Long albumId;
 }

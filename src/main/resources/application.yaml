@@ -1,23 +1,14 @@
 spring:
   application:
     name: tracks-service
-  datasource:
-    url: jdbc:postgresql://postgresql:5432/postgres
-    username: postgres
-    password: password
-  jpa:
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        hbm2ddl:
-          auto: validate
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
   mvc:
     format:
       date: iso
+  neo4j:
+    uri: bolt://neo4j:7687
+    authentication:
+      username: neo4j
+      password: password
 
 eureka:
   instance:

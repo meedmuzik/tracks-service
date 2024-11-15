@@ -55,7 +55,7 @@ public class ImageController {
     }
 
     @PostMapping("/album/{id}")
-    public ResponseEntity<Object> uploadImageForAlbum(@PathVariable("id") @Min(1) Integer id,
+    public ResponseEntity<Object> uploadImageForAlbum(@PathVariable("id") @Min(1) Long id,
                                                       MultipartFile image) {
         if (!albumsService.isAlbumExistsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

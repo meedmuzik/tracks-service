@@ -6,7 +6,6 @@ import org.scuni.tracksservice.dto.TrackCreateEditDto;
 import org.scuni.tracksservice.dto.TrackReadDto;
 import org.scuni.tracksservice.mapper.TrackCreateEditMapper;
 import org.scuni.tracksservice.mapper.TrackReadMapper;
-import org.scuni.tracksservice.model.entity.Album;
 import org.scuni.tracksservice.model.entity.Track;
 import org.scuni.tracksservice.repository.AlbumRepository;
 import org.scuni.tracksservice.repository.TrackRepository;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,17 +39,24 @@ public class TrackService {
         return allByIds.stream().map(trackReadMapper::map).collect(Collectors.toList());
     }
 
-    public void deleteTrackById(Long id){
+    public void deleteTrackById(Long id) {
         Track track = trackRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        trackRepository.deleteTrackRelationships(id);
         trackRepository.delete(track);
     }
 
     public TrackReadDto updateTrackById(Long id, TrackCreateEditDto trackCreateEditDto) {
         Track track = trackRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         track.setTitle(trackCreateEditDto.getTitle());
+        Long trackId = track.getId();
         if (trackCreateEditDto.getAlbumId() != null) {
-            albumRepository.findById(trackCreateEditDto.getAlbumId()).ifPresent(track::setAlbum);
+            Long newAlbumId = trackCreateEditDto.getAlbumId();
+            if (track.getAlbum() != null && !track.getAlbum().getId().equals(newAlbumId)) {
+                albumRepository.deleteTrackAndRelationship(track.getAlbum().getId(), track.getId());
+            }
+            albumRepository.findById(trackCreateEditDto.getAlbumId())
+                    .ifPresent(album -> albumRepository.addTrackToAlbum(album.getId(), trackId));
         }
         track.setReleaseDate(trackCreateEditDto.getReleaseDate());
         return trackReadMapper.map(track);
@@ -59,15 +64,17 @@ public class TrackService {
 
     public Long createTrack(TrackCreateEditDto trackCreateEditDto) {
         Track track = trackCreateEditMapper.map(trackCreateEditDto);
+        track = trackRepository.save(track);
+        Long trackId = track.getId();
         if (trackCreateEditDto.getAlbumId() != null) {
-            Optional<Album> album = albumRepository.findById(trackCreateEditDto.getAlbumId());
-            album.ifPresent(track::setAlbum);
+            albumRepository.findById(trackCreateEditDto.getAlbumId())
+                    .ifPresent(album -> albumRepository.addTrackToAlbum(album.getId(), trackId));
+//            album.ifPresent(track::setAlbum);
         }
-        trackRepository.saveAndFlush(track);
         return track.getId();
     }
 
-    public void updateImageIdById(String imageId, Long id){
+    public void updateImageIdById(String imageId, Long id) {
         trackRepository.updateImageIdById(id, imageId);
     }
 
@@ -76,7 +83,7 @@ public class TrackService {
         return tracks.map(trackReadMapper::map);
     }
 
-    public boolean isTrackExistsById(Long id){
+    public boolean isTrackExistsById(Long id) {
         return trackRepository.existsById(id);
     }
 }

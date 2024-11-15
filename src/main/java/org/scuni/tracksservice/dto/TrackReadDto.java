@@ -12,6 +12,6 @@ public class TrackReadDto {
     private String title;
     private String imageUrl;
     private LocalDate releaseDate;
-    private Integer albumId;
+    private Long albumId;
     private String albumTitle;
 }
