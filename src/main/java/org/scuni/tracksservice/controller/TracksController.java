@@ -31,7 +31,7 @@ public class TracksController {
     }
 
     @GetMapping("/tracks")
-    public ResponseEntity<Object> getAlbumByIds(@RequestParam("ids") List<Long> ids) {
+    public ResponseEntity<Object> getTracksByIds(@RequestParam("ids") List<Long> ids) {
         List<TrackReadDto> tracksReadDtos = trackService.getTracksByIds(ids);
         return ResponseEntity.status(HttpStatus.OK)
                 .contentType(MediaType.APPLICATION_JSON)
