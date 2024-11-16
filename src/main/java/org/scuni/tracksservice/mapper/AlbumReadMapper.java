@@ -20,7 +20,7 @@ public class AlbumReadMapper implements Mapper<Album, AlbumReadDto>{
     @Override
     public AlbumReadDto map(Album album) {
         List<TrackReadDto> tracks = new ArrayList<>();
-        Set<Track> albumTracks = album.getTracks();
+        List<Track> albumTracks = album.getTracks();
         for (Track albumTrack : albumTracks) {
             tracks.add(trackReadMapper.map(albumTrack));
         }

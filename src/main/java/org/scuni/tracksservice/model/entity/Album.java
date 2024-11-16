@@ -6,15 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Node("Album")
@@ -23,7 +22,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "tracks")
 @EqualsAndHashCode(of = "id")
 public class Album {
     @Id
@@ -37,11 +35,8 @@ public class Album {
     private String imageId;
 
     @Relationship(type = "HAS_TRACK", direction = Relationship.Direction.OUTGOING)
-    private Set<Track> tracks = new HashSet<>();
-
-    public void addTrack(Track track) {
-        tracks.add(track);
-    }
+    @Builder.Default
+    private List<Track> tracks = new ArrayList<>();
 }
 
 

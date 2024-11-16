@@ -18,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,13 +45,12 @@ public class AlbumsService {
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         albumRepository.deleteAlbumAndRelationships(id);
-//        albumRepository.delete(album);
     }
 
     public void deleteTrackFromAlbum(Long trackId, Long albumId) {
         Album album = albumRepository.findById(albumId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "album with id" + albumId + " does not exist"));
-        Set<Track> tracks = album.getTracks();
+        List<Track> tracks = album.getTracks();
         Track trackToRemove = tracks.stream()
                 .filter(track -> track.getId().equals(trackId))
                 .findFirst()
@@ -60,7 +58,8 @@ public class AlbumsService {
                         "track with id" + trackId + "not in album"));
         albumRepository.deleteTrackAndRelationship(albumId, trackId);
         tracks.remove(trackToRemove);
-        trackToRemove.setAlbum(null);
+        trackToRemove.setAlbumId(null);
+        trackRepository.save(trackToRemove);
     }
 
     public AlbumReadDto updateAlbumById(Long id, AlbumCreateEditDto albumCreateEditDto) {
@@ -83,14 +82,14 @@ public class AlbumsService {
         }
         Optional<Album> optionalAlbum = albumRepository.findById(albumId);
         if (optionalAlbum.isPresent()) {
-//            Album album = optionalAlbum.get();
-//            album.addTrack(optionalTrack.get());
-//            Track track = optionalTrack.get();
-//            track.setAlbum(album);
             albumRepository.addTrackToAlbum(albumId, trackId);
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "album with id: " + albumId + "does not exist");
         }
+        optionalTrack.ifPresent((track) -> {
+            track.setAlbumId(albumId);
+            trackRepository.save(track);
+        });
     }
 
     public Page<AlbumReadDto> getAlbumsByTitle(String title, Pageable pageable) {

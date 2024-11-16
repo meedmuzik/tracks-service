@@ -12,6 +12,7 @@ public class TrackCreateEditMapper implements Mapper<TrackCreateEditDto, Track> 
         return Track.builder()
                 .title(trackCreateEditDto.getTitle())
                 .rating(0.0)
+                .albumId(trackCreateEditDto.getAlbumId())
                 .releaseDate(trackCreateEditDto.getReleaseDate())
                 .build();
     }

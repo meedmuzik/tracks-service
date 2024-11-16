@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface AlbumRepository extends Neo4jRepository<Album, Long> {
 
-    @Query("MATCH (a:Album) WHERE id(a) = $id SET a.imageId = $filimageIdename")
+    @Query("MATCH (a:Album) WHERE id(a) = $id SET a.imageId = $imageId")
     void updateImageIdById(@Param("id") Long id, @Param("imageId") String imageId);
 
     @Query(value = "MATCH (a:Album) WHERE a.title CONTAINS $title RETURN a SKIP $skip LIMIT $limit",
@@ -20,21 +20,22 @@ public interface AlbumRepository extends Neo4jRepository<Album, Long> {
     Page<Album> findAlbumByTitleContainingIgnoreCase(@Param("title") String title, Pageable pageable);
 
     @Query("""
-                MATCH (t:Track)-[:HAS_TRACK]->(a:Album)
+                MATCH (a:Album)-[:HAS_TRACK]->(t:Track)
                 WHERE id(t) IN ids
                 RETURN DISTINCT a
             """)
     List<Album> findAllByIds(@Param("ids") List<Long> ids);
 
     @Query("""
-                MATCH (a:Album)-[r:HAS_TRACK]->(t:Track)
-                WHERE id(a) = $albumId
-                DELETE r, a
-            """)
+        MATCH (a:Album)-[r:HAS_TRACK]->(t:Track)
+        WHERE id(a) = $albumId
+        SET t.albumId = null
+        DELETE r, a
+        """)
     void deleteAlbumAndRelationships(@Param("albumId") Long albumId);
 
     @Query("""
-                MATCH (a:Album)-[r:HAS_TRACK]->(t:Track)
+                MATCH (a:Album)-[r:HAS_TRACK]->(a:Track)
                 WHERE id(a) = $albumId AND id(t) = $trackId
                 DELETE r, t
             """)
@@ -48,6 +49,3 @@ public interface AlbumRepository extends Neo4jRepository<Album, Long> {
     void addTrackToAlbum(@Param("albumId") Long albumId, @Param("trackId") Long trackId);
 
 }
-
-//    @Query("SELECT a FROM Album a JOIN FETCH a.tracks WHERE a.id = :id")
-//    Optional<Album> findByIdWithTracks(Integer id);

@@ -6,11 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Relationship;
+
 
 import java.time.LocalDate;
 
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(exclude = "album")
 @EqualsAndHashCode(of = "id")
 public class Track {
     @Id
@@ -35,6 +33,6 @@ public class Track {
 
     private Double rating;
 
-    @Relationship(type = "HAS_TRACK", direction = Relationship.Direction.INCOMING)
-    private Album album;
+    private Long albumId;
+
 }

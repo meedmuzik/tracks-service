@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,7 +35,7 @@ public class TrackService {
 
     public List<TrackReadDto> getTracksByIds(List<Long> ids) {
         List<Track> allByIds = trackRepository.findAllByIds(ids);
-        return allByIds.stream().map(trackReadMapper::map).collect(Collectors.toList());
+        return allByIds.stream().map(trackReadMapper::map).toList();
     }
 
     public void deleteTrackById(Long id) {
@@ -52,8 +51,8 @@ public class TrackService {
         Long trackId = track.getId();
         if (trackCreateEditDto.getAlbumId() != null) {
             Long newAlbumId = trackCreateEditDto.getAlbumId();
-            if (track.getAlbum() != null && !track.getAlbum().getId().equals(newAlbumId)) {
-                albumRepository.deleteTrackAndRelationship(track.getAlbum().getId(), track.getId());
+            if (track.getAlbumId() != null && !track.getAlbumId().equals(newAlbumId)) {
+                albumRepository.deleteTrackAndRelationship(track.getAlbumId(), track.getId());
             }
             albumRepository.findById(trackCreateEditDto.getAlbumId())
                     .ifPresent(album -> albumRepository.addTrackToAlbum(album.getId(), trackId));
@@ -90,7 +89,12 @@ public class TrackService {
     public void updateTrackRating(Long id) {
         Track track = trackRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Double updatedRating = trackRepository.calculateTrackRating(id);
+        if (updatedRating == null) {
+            updatedRating = 0.0;
+        }
         track.setRating(updatedRating);
         trackRepository.save(track);
     }
+
+
 }
