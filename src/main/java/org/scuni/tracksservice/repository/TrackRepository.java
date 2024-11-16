@@ -29,7 +29,7 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
     void deleteTrackRelationships(@Param("trackId") Long trackId);
 
     @Query("""
-        MATCH (t:Track)-[:HAS_COMMENT]->(c:Comment)
+        MATCH (c:Comment)-[:COMMENTED_ON]->(t:Track)
         WHERE id(t) = $trackId
         RETURN AVG(c.rating) AS averageRating
     """)

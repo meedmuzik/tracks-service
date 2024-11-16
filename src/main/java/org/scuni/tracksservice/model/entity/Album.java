@@ -35,7 +35,7 @@ public class Album {
     private LocalDate releaseDate;
 
     private String imageId;
-
+    @Builder.Default
     @Relationship(type = "HAS_TRACK", direction = Relationship.Direction.OUTGOING)
     private Set<Track> tracks = new HashSet<>();
 

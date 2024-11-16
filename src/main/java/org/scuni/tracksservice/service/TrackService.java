@@ -2,6 +2,7 @@ package org.scuni.tracksservice.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.scuni.tracksservice.dto.TrackCreateEditDto;
 import org.scuni.tracksservice.dto.TrackReadDto;
 import org.scuni.tracksservice.mapper.TrackCreateEditMapper;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class TrackService {
 
     private final TrackRepository trackRepository;
@@ -88,8 +90,14 @@ public class TrackService {
     }
 
     public void updateTrackRating(Long id) {
+        log.info("id трека: {}", id);
         Track track = trackRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        log.info("Трек c id {}: {}", id, track);
         Double updatedRating = trackRepository.calculateTrackRating(id);
+        if (updatedRating == null) {
+            updatedRating = 0.0;
+        }
+        log.info("Новый рейтинг {}", updatedRating);
         track.setRating(updatedRating);
         trackRepository.save(track);
     }

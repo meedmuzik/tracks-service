@@ -87,7 +87,7 @@ public class TracksController {
                 .body(Map.of("tracks", tracks));
     }
 
-    @PatchMapping("/track/rating/{id}")
+    @PostMapping("/track/rating/{id}")
     public ResponseEntity<Object> updateTrackRating(@PathVariable("id") @Min(1) Long id) {
         trackService.updateTrackRating(id);
         return ResponseEntity.noContent().build();
