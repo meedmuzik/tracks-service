@@ -2,6 +2,7 @@ package org.scuni.tracksservice.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.scuni.tracksservice.dto.QueryDto;
 import org.scuni.tracksservice.dto.TrackCreateEditDto;
 import org.scuni.tracksservice.dto.TrackReadDto;
 import org.scuni.tracksservice.mapper.TrackCreateEditMapper;
@@ -9,6 +10,7 @@ import org.scuni.tracksservice.mapper.TrackReadMapper;
 import org.scuni.tracksservice.model.entity.Track;
 import org.scuni.tracksservice.repository.AlbumRepository;
 import org.scuni.tracksservice.repository.TrackRepository;
+import org.scuni.tracksservice.service.client.CommentsClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -26,6 +29,7 @@ public class TrackService {
     private final AlbumRepository albumRepository;
     private final TrackReadMapper trackReadMapper;
     private final TrackCreateEditMapper trackCreateEditMapper;
+    private final CommentsClient commentsClient;
 
     public TrackReadDto getTrackById(Long id) {
         return trackRepository.findById(id)
@@ -96,5 +100,13 @@ public class TrackService {
         trackRepository.save(track);
     }
 
+    public List<TrackReadDto> getRecommendedTracks(QueryDto query) {
+        Map<String, List<Long>> recommendedCommentsIds = commentsClient.getRecommendedCommentsIds(query);
+        return trackRepository.findTracksByCommentsIds(recommendedCommentsIds.get("commentsIds"))
+                .stream()
+                .distinct()
+                .map(trackReadMapper::map)
+                .toList();
+    }
 
 }

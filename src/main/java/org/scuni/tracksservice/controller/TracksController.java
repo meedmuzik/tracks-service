@@ -2,6 +2,7 @@ package org.scuni.tracksservice.controller;
 
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.scuni.tracksservice.dto.QueryDto;
 import org.scuni.tracksservice.dto.TrackCreateEditDto;
 import org.scuni.tracksservice.dto.TrackReadDto;
 import org.scuni.tracksservice.service.TrackService;
@@ -24,6 +25,14 @@ import java.util.Map;
 public class TracksController {
 
     private final TrackService trackService;
+
+    @PostMapping("/recommendations/tracks")
+    public ResponseEntity<Object> getRecommendedArtists(@RequestBody QueryDto query) {
+        List<TrackReadDto> recommendedTracks = trackService.getRecommendedTracks(query);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("tracks", recommendedTracks));
+    }
 
     @GetMapping("/track/{id}")
     public ResponseEntity<TrackReadDto> getTrack(@PathVariable("id") @Min(1) Long id) {
