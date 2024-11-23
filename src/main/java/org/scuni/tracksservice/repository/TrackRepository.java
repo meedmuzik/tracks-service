@@ -34,4 +34,9 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
         RETURN AVG(c.rating) AS averageRating
     """)
     Double calculateTrackRating(@Param("trackId") Long trackId);
+
+    @Query("MATCH (c:Comment)-[:COMMENTED_ON]->(t:Track) " +
+           "WHERE id(c) IN $ids " +
+           "RETURN DISTINCT t")
+    List<Track> findTracksByCommentsIds(@Param("ids") List<Long> ids);
 }
