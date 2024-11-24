@@ -102,4 +102,14 @@ public class TracksController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/tracks/top-rated")
+    public ResponseEntity<Object> getTopRatedTracks(@RequestParam @Min(0) int page,
+                                                    @RequestParam @Min(1) int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("rating")));
+        Page<TrackReadDto> tracks = trackService.getTopRatedTracks(pageRequest);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("tracks", tracks));
+    }
+
 }

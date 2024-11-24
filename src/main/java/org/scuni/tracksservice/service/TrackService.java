@@ -108,5 +108,9 @@ public class TrackService {
                 .map(trackReadMapper::map)
                 .toList();
     }
+    public Page<TrackReadDto> getTopRatedTracks(Pageable pageable) {
+        Page<Track> tracks = trackRepository.findTopRatedTracks(pageable);
+        return tracks.map(trackReadMapper::map);
+    }
 
 }

@@ -39,4 +39,20 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
            "WHERE id(c) IN $ids " +
            "RETURN DISTINCT t")
     List<Track> findTracksByCommentsIds(@Param("ids") List<Long> ids);
+
+    @Query(value = """
+        MATCH (t:Track)<-[:COMMENTED_ON]-(c:Comment)
+        WITH t, AVG(c.rating) AS avgRating
+        RETURN t
+        ORDER BY avgRating DESC
+        SKIP $skip LIMIT $limit
+        """,
+            countQuery = """
+        MATCH (t:Track)<-[:COMMENTED_ON]-(c:Comment)
+        WITH t, AVG(c.rating) AS avgRating
+        RETURN count(t)
+        """)
+    Page<Track> findTopRatedTracks(Pageable pageable);
+
 }
+
