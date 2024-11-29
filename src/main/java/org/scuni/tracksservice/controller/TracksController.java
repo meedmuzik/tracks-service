@@ -63,6 +63,15 @@ public class TracksController {
                         "image upload url", "/api/v1/images/track/" + trackId));
     }
 
+    @PostMapping("/tracks")
+    public ResponseEntity<Object> createTracks(@RequestBody @Validated List<TrackCreateEditDto> trackCreateEditDtos){
+        List<Long> ids = trackService.createTracks(trackCreateEditDtos);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("message", "Tracks was uploaded successfully",
+                        "ids", ids));
+    }
+
     @PutMapping("/track/{id}")
     public ResponseEntity<Object> updateTrackById(@PathVariable("id") @Min(1) Long id,
                                                   @RequestBody @Validated TrackCreateEditDto trackCreateEditDto) {
