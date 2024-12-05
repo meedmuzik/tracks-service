@@ -102,4 +102,13 @@ public class TracksController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/recommendations/feats")
+    public ResponseEntity<Object> updateTrackRating(@RequestParam @Min(0) int page,
+                                                    @RequestParam @Min(1) int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<TrackReadDto> recommendedTracks = trackService.getRecommendedFeats(pageRequest);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("tracks", recommendedTracks));
+    }
 }
