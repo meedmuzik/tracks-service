@@ -63,6 +63,15 @@ public class TracksController {
                         "image upload url", "/api/v1/images/track/" + trackId));
     }
 
+    @PostMapping("/tracks")
+    public ResponseEntity<Object> createTracks(@RequestBody @Validated List<TrackCreateEditDto> trackCreateEditDtos){
+        List<Long> ids = trackService.createTracks(trackCreateEditDtos);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("message", "Tracks was uploaded successfully",
+                        "ids", ids));
+    }
+
     @PutMapping("/track/{id}")
     public ResponseEntity<Object> updateTrackById(@PathVariable("id") @Min(1) Long id,
                                                   @RequestBody @Validated TrackCreateEditDto trackCreateEditDto) {
@@ -111,4 +120,15 @@ public class TracksController {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Map.of("tracks", recommendedTracks));
     }
+
+    @GetMapping("/tracks/top-rated")
+    public ResponseEntity<Object> getTopRatedTracks(@RequestParam @Min(0) int page,
+                                                    @RequestParam @Min(1) int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Order.desc("rating")));
+        Page<TrackReadDto> tracks = trackService.getTopRatedTracks(pageRequest);
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("tracks", tracks));
+    }
+
 }
