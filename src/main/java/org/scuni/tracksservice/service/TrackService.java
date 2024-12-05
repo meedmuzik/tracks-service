@@ -122,4 +122,9 @@ public class TrackService {
         return tracks.map(trackReadMapper::map);
     }
 
+    public Page<TrackReadDto> getRecommendedFeats(Pageable pageable){
+        Page<Track> tracks = trackRepository.findBestFeats(pageable);
+        return tracks.map(trackReadMapper::map);
+    }
+
 }

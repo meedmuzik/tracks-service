@@ -12,7 +12,7 @@ import java.util.List;
 public interface TrackRepository extends Neo4jRepository<Track, Long> {
 
     @Query("MATCH (t:Track) WHERE id(t) = $id SET t.imageId = $imageId")
-    void updateImageIdById(@Param("id") Long id,@Param("imageId") String imageId);
+    void updateImageIdById(@Param("id") Long id, @Param("imageId") String imageId);
 
     @Query(value = "MATCH (t:Track) WHERE t.title CONTAINS $title RETURN t SKIP $skip LIMIT $limit",
             countQuery = "MATCH (t:Track) WHERE t.title CONTAINS $title RETURN count(t)")
@@ -22,17 +22,17 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
     List<Track> findAllByIds(@Param("ids") List<Long> ids);
 
     @Query("""
-        MATCH (t:Track)-[r]-()
-        WHERE id(t) = $trackId
-        DELETE r
-    """)
+                MATCH (t:Track)-[r]-()
+                WHERE id(t) = $trackId
+                DELETE r
+            """)
     void deleteTrackRelationships(@Param("trackId") Long trackId);
 
     @Query("""
-        MATCH (c:Comment)-[:COMMENTED_ON]->(t:Track)
-        WHERE id(t) = $trackId
-        RETURN AVG(c.rating) AS averageRating
-    """)
+                MATCH (c:Comment)-[:COMMENTED_ON]->(t:Track)
+                WHERE id(t) = $trackId
+                RETURN AVG(c.rating) AS averageRating
+            """)
     Double calculateTrackRating(@Param("trackId") Long trackId);
 
     @Query("MATCH (c:Comment)-[:COMMENTED_ON]->(t:Track) " +
@@ -40,6 +40,22 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
            "RETURN DISTINCT t")
     List<Track> findTracksByCommentsIds(@Param("ids") List<Long> ids);
 
+    @Query(value = """
+                MATCH (t:Track)<-[:HAS_TRACK]-(a:Artist)
+                WITH t, COUNT(a) AS artistCount
+                WHERE artistCount > 1
+                RETURN t
+                ORDER BY t.rating DESC
+            """,
+            countQuery = """
+                        MATCH (t:Track)<-[:HAS_TRACK]-(a:Artist)
+                        WITH t, COUNT(a) AS artistCount
+                        WHERE artistCount > 1
+                        RETURN COUNT(t)
+                    """
+    )
+    Page<Track> findBestFeats(Pageable pageable);
+           
     @Query(value = """
         MATCH (t:Track)<-[:COMMENTED_ON]-(c:Comment)
         WITH t, AVG(c.rating) AS avgRating
