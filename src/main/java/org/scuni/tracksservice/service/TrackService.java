@@ -127,4 +127,7 @@ public class TrackService {
         return tracks.map(trackReadMapper::map);
     }
 
+    public List<Long> getArtistIds(Long id) {
+        return trackRepository.getArtistIdsByTrackId(id);
+    }
 }

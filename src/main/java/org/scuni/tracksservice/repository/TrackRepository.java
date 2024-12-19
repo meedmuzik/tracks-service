@@ -70,5 +70,11 @@ public interface TrackRepository extends Neo4jRepository<Track, Long> {
         """)
     Page<Track> findTopRatedTracks(Pageable pageable);
 
+    @Query("""
+        MATCH (a:Artist)-[:HAS_TRACK]->(t:Track)
+        WHERE id(t) = $trackId
+        RETURN id(a) AS artistId
+        """)
+    List<Long> getArtistIdsByTrackId(@Param("trackId") Long trackId);
 }
 

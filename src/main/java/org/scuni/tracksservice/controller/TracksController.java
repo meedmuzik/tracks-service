@@ -6,6 +6,7 @@ import org.scuni.tracksservice.dto.QueryDto;
 import org.scuni.tracksservice.dto.TrackCreateEditDto;
 import org.scuni.tracksservice.dto.TrackReadDto;
 import org.scuni.tracksservice.service.TrackService;
+import org.scuni.tracksservice.service.client.ArtistClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class TracksController {
 
     private final TrackService trackService;
+    private final ArtistClient artistClient;
 
     @PostMapping("/recommendations/tracks")
     public ResponseEntity<Object> getRecommendedArtists(@RequestBody QueryDto query) {
@@ -108,6 +110,10 @@ public class TracksController {
     @PostMapping("/track/rating/{id}")
     public ResponseEntity<Object> updateTrackRating(@PathVariable("id") @Min(1) Long id) {
         trackService.updateTrackRating(id);
+        List<Long> artistIds = trackService.getArtistIds(id);
+        for (Long artistId : artistIds) {
+            artistClient.updateArtistRating(artistId);
+        }
         return ResponseEntity.noContent().build();
     }
 
